@@ -1,0 +1,69 @@
+<?php
+require_once("funcao.php");
+
+//echo "aqui";
+//die();
+
+$token = md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
+
+session_name($token);
+session_start();
+
+/*
+unset($_SESSION["login"]);
+unset($_SESSION["senha"]);
+unset($_SESSION["token"]);
+$_SESSION = array();
+session_destroy();
+*/
+
+dumpF($_SESSION);
+//dumpF($_SERVER);
+
+if (
+    !isset($_SESSION["login"]) || !isset($_SESSION["senha"]) || !isset($_SESSION["token"])
+) {
+    session_destroy();
+    header("location:index.php?erro=SEMLOGIN");
+}
+
+
+
+if ($_SESSION["token"] != $token) {
+    session_destroy();
+    header("location:index.php?erro=INVASAO");
+}
+
+echo "aqui!";
+
+if (!validarLogin($_SESSION["login"], $_SESSION["senha"])) {
+    session_destroy();
+    header("location:index.php?erro=LOGININVALIDO");
+}
+
+revalidarLogin();
+
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <div>
+        Você é bem vindo e está autenticado!
+    </div>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<?php
+
+session_destroy(); //remover depois que explicar o conteúdo

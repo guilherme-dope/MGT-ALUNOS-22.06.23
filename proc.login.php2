@@ -1,0 +1,68 @@
+<?php
+//var_dump($_POST);
+
+if (!isset($_POST))
+{
+    header("location:index.php?erro=SEMLOGIN");
+}
+
+if (!isset($_POST['dslogin']) || !isset($_POST['dssenha']))
+{
+    header("location:index.php?erro=SEMLOGIN");
+}
+
+require_once("funcao.php");
+
+if (validar_nome($_POST['dslogin'])=="ok")
+{
+    $login = $_POST['dslogin'];
+}
+else
+{
+    header("location:index.php?erro=" . validar_nome($_POST['dslogin']));    
+}
+
+if (validar_nome($_POST['dssenha'])=="ok")
+{
+    $senha = md5($_POST['dssenha']);
+}
+else
+{
+    header("location:index.php?erro=" . validar_nome($_POST['dssenha']));    
+}
+
+echo "login: $login <br/> senha: $senha";
+
+
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$user = 'root';
+$password = '';
+$database = 'aedb_quinto';
+
+$hostname = "localhost"; 
+
+$sqlLogin =   " SELECT * " .
+              " FROM login l " .
+              " WHERE l.dslogin = '@nome' " .
+              " and l.dssenha = '@senha' ";
+
+
+$sql = str_replace("@nome",$login,$sqlLogin);
+$sql = str_replace("@senha",$senha,$sql);
+
+$con = mysqli_connect( $hostname, $user, $password ) or die('Erro na conexão');
+if (mysqli_connect_errno()) trigger_error(mysqli_connect_error());
+# Seleciona o banco de dados 
+mysqli_select_db($con, $database) or die('Erro na seleção do banco');
+
+$resultado = mysqli_query($con , $sql);
+
+$registros = mysqli_num_rows($resultado);
+
+echo "<br/>Registros: $registros";
+
+
+var_dump(validarLogin($login,$senha));
+?>
